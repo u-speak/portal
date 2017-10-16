@@ -17,7 +17,7 @@
       ></v-text-field>
     </v-toolbar>
     <main>
-      <v-container>
+      <v-container grid-list-md>
         <v-layout row wrap align-center>
           <v-flex xs4 v-for="post in posts" :key="post.title">
             <v-card class="my-3" hover>
