@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
+import VueResource from 'vue-resource'
 import PageUspeak from './PageUspeak.vue'
 const Home = resolve => require(['./Views/Home.vue'], resolve)
 
 Vue.use(Vuetify)
 Vue.use(VueRouter)
+Vue.use(VueResource)
 Vue.config.productionTip = false
 
 const router = new VueRouter({
