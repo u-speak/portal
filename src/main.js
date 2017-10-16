@@ -1,17 +1,24 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import App from './App'
-import router from './router'
+import VueRouter from 'vue-router'
+import PageUspeak from './PageUspeak.vue'
+const Home = resolve => require(['./Views/Home.vue'], resolve)
 
 Vue.use(Vuetify)
+Vue.use(VueRouter)
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: Home
+    }
+  ]
 })
+new Vue({
+  router,
+  template: '<PageUspeak/>',
+  components: { PageUspeak }
+}).$mount('#app')
