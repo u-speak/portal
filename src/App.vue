@@ -19,7 +19,7 @@
     <main>
       <v-container>
         <v-layout row wrap align-center>
-          <div v-for="post in posts" :key="post.title">
+          <v-flex xs4 v-for="post in posts" :key="post.title">
             <v-card class="my-3" hover>
               <v-card-media class="white--text" height="190px" :src="post.imgUrl">
                 <v-container fill-height fluid>
@@ -36,7 +36,7 @@
                 <v-btn flat class="blue--text">Read More</v-btn>
               </v-card-actions>
             </v-card>
-          </div>
+          </v-flex>
         </v-layout>
       </v-container>
     </main>
