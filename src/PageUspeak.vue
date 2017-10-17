@@ -9,20 +9,17 @@
           </transition>
         </v-container>
     </main>
-    <page-footer></page-footer>
   </div>
   </v-app>
 </template>
 
 <script>
   import PageHeader from './PageHeader.vue'
-  import PageFooter from './PageFooter.vue'
 
   export default {
     name: 'page-uspeak',
     components: {
-      PageHeader,
-      PageFooter
+      PageHeader
     }
   }
 </script>
@@ -30,7 +27,6 @@
 <style lang="stylus">
   @import './stylus/main'
   #e3, #e3 .container {
-    min-height: 700px;
     overflow: hidden;
     z-index: 0;
   }
