@@ -3,13 +3,13 @@
 <template>
   <v-container grid-list-md>
     <v-layout row wrap align-center>
-      <v-flex xs4 v-for="post in posts" :key="post.title">
+      <v-flex xs4 v-for="post in posts" :key="post.content">
         <v-card class="my-3" hover>
-          <v-card-media class="white--text" height="190px" :src="post.imgUrl">
+          <v-card-media class="white--text" height="190px">
             <v-container fill-height fluid>
               <v-layout fill-height>
                 <v-flex align-end flexbox>
-                  <span class="headline">{{ post.title }}</span>
+                  <span class="headline">{{ post.content }}</span>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -17,7 +17,7 @@
           <v-card-text>{{ post.content }}</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn flat class="blue--text">Read More</v-btn>
+            <v-btn flat class="blue--text" v-on:click.native="readPost(post)">Read More</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -30,17 +30,23 @@
     name: 'posts',
     data () {
       return {
-        posts: [
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' },
-          { title: 'Fusce ullamcorper tellus sed maximus', content: 'Fusce ullamcorper tellus sed maximus rutrum. Donec imperdiet ultrices maximus. Donec non tellus non neque pellentesque fermentum. Aenean in pellentesque urna. Mauris aliquet elit rutrum lorem fermentum, id lobortis arcu facilisis. Mauris ut justo magna. Vivamus euismod fringilla. ', imgUrl: 'https://raw.githubusercontent.com/vuetifyjs/docs/dev/static/doc-images/cards/drop.jpg' }
-        ]
+        posts: []
+      }
+    },
+    created () {
+      this.fetch()
+    },
+    methods: {
+      fetch () {
+        this.$http.get('http://127.0.0.1:3000/api/v1/chains/post').then((res) => {
+          this.posts = this.posts.concat(res.body.results)
+        })
+      },
+      readPost (post) {
+        if (!post.hash) {
+          return
+        }
+        this.$router.push({ name: 'post', params: { hash: post.hash } })
       }
     }
   }
