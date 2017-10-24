@@ -11,12 +11,18 @@
       single-line
       append-icon="search"
       hide-details
+      v-on:keyup.enter="search($event.target.value)"
     ></v-text-field>
   </v-toolbar>
 </template>
 
 <script>
   export default {
-    name: 'page-header'
+    name: 'page-header',
+    methods: {
+      search (text) {
+        this.$bus.$emit('search', text)
+      }
+    }
   }
 </script>

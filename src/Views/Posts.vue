@@ -35,10 +35,11 @@
     },
     created () {
       this.fetch()
+      this.$bus.$on('search', (text) => { this.search(text) })
     },
     methods: {
       fetch () {
-        this.$http.get('http://127.0.0.1:3000/api/v1/chains/post').then((res) => {
+        this.$http.get('https://127.0.0.1:3000/api/v1/chains/post').then((res) => {
           this.posts = this.posts.concat(res.body.results)
         })
       },
@@ -47,6 +48,11 @@
           return
         }
         this.$router.push({ name: 'post', params: { hash: post.hash } })
+      },
+      search (text) {
+        this.$http.get('https://127.0.0.1:3000/api/v1/search?q=' + text).then((res) => {
+          this.posts = res.body.results
+        })
       }
     }
   }

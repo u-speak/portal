@@ -45,6 +45,7 @@ const router = new VueRouter({
     }
   ]
 })
+Vue.prototype.$bus = new Vue({})
 new Vue({
   router,
   template: '<PageUspeak/>',
