@@ -3,6 +3,9 @@
 <template>
   <v-toolbar fixed>
     <v-toolbar-title>
+      <v-btn flat icon to='/'>
+        <v-icon>home</v-icon>
+      </v-btn>
       uspeak
     </v-toolbar-title>
     <v-spacer></v-spacer>

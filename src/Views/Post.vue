@@ -30,7 +30,7 @@
     },
     methods: {
       fetch () {
-        this.$http.get('https://127.0.0.1:3000/api/v1/chains/post/' + this.$route.params.hash).then((res) => {
+        this.$http.get('https://uspeak.io:4242/api/v1/chains/post/' + this.$route.params.hash).then((res) => {
           this.post = res.body
         })
       }

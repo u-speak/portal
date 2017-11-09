@@ -9,6 +9,16 @@
           </transition>
         </v-container>
     </main>
+    <v-btn
+      fab
+      bottom
+      right
+      dark
+      fixed
+      to="/create"
+    >
+      <v-icon>add</v-icon>
+    </v-btn>
   </div>
   </v-app>
 </template>

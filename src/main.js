@@ -6,6 +6,7 @@ import Marked from 'marked'
 import PageUspeak from './PageUspeak.vue'
 const Home = resolve => require(['./Views/Home.vue'], resolve)
 const Post = resolve => require(['./Views/Post.vue'], resolve)
+const CreatePost = resolve => require(['./Views/CreatePost.vue'], resolve)
 
 Vue.use(Vuetify)
 Vue.use(VueRouter)
@@ -42,6 +43,11 @@ const router = new VueRouter({
       path: '/post/:hash',
       name: 'post',
       component: Post
+    },
+    {
+      path: '/create',
+      name: 'create',
+      component: CreatePost
     }
   ]
 })
