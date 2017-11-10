@@ -61,11 +61,11 @@
     methods: {
       ...mapActions(['notify']),
       create () {
-        this.$http.get('https://uspeak.io/api/v1/status').then((res) => {
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
           this.post.previous_hash = res.body.chains.post.last_hash
           this.post.date = moment().unix()
           this.post.hash = sha256('C' + this.post.content + 'T' + this.post.type + 'S' + this.post.signature + 'P' + this.post.public_key + 'D' + this.post.date + 'N' + this.post.nonce + 'PREV' + this.post.previous_hash.toString(base64Enc)).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_')
-          this.$http.post('https://uspeak.io/api/v1/chains/post', this.post).then((res) => {
+          this.$http.post(`https://${this.$store.getters.node}/api/v1/chains/post`, this.post).then((res) => {
             this.$router.push({path: '/'})
           }, (err) => {
             this.notify({ msg: err.body.message, show: true })

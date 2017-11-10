@@ -43,7 +43,7 @@
     methods: {
       ...mapActions(['notify']),
       fetch () {
-        this.$http.get('https://uspeak.io/api/v1/chains/post').then((res) => {
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/chains/post`).then((res) => {
           this.posts = res.body.results
         }, (err) => {
           if (err.body.message === 'Chain Validation Failed') {
@@ -63,7 +63,7 @@
         this.$router.push({ name: 'post', params: { hash: post.hash } })
       },
       search (text) {
-        this.$http.get('https://uspeak.io/api/v1/search?q=' + text).then((res) => {
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/search?q=${text}`).then((res) => {
           this.posts = res.body.results
         }, (err) => {
           this.notify({ msg: err.body.message, show: true })

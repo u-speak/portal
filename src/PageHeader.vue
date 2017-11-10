@@ -10,6 +10,13 @@
     </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-text-field
+      label="Node"
+      single-line
+      hide-details
+      v-on:keyup.enter="changeNode($event.target.value)"
+      ></v-text-field>
+    <v-spacer></v-spacer>
+    <v-text-field
       label="Search..."
       single-line
       append-icon="search"
@@ -25,6 +32,10 @@
     methods: {
       search (text) {
         this.$bus.$emit('search', text)
+      },
+      changeNode (node) {
+        this.$store.commit('setNode', node)
+        this.$bus.$emit('refresh')
       },
       goHome () {
         if (this.$route.path === '/') {

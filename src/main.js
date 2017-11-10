@@ -56,6 +56,7 @@ const router = new VueRouter({
 
 const store = new Vuex.Store({
   state: {
+    node: 'uspeak.io',
     snaker: {
       x: 'left',
       y: 'top',
@@ -79,6 +80,9 @@ const store = new Vuex.Store({
     },
     msg ({ snaker }) {
       return snaker.msg
+    },
+    node ({ node }) {
+      return node
     }
   },
   mutations: {
@@ -97,6 +101,9 @@ const store = new Vuex.Store({
     inform ({ snaker }, msg) {
       snaker.msg = msg
       snaker.show = true
+    },
+    setNode (state, n) {
+      state.node = n
     }
   },
   actions: {
