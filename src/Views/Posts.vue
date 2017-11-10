@@ -5,7 +5,7 @@
     <v-layout row wrap align-center>
       <v-flex xs4 v-for="post in posts" :key="post.content">
         <v-card class="my-3" hover>
-          <v-card-media class="white--text" height="190px">
+          <v-card-media class="white--text" height="190px" src="https://picsum.photos/573/190/?random">
             <v-container fill-height fluid>
               <v-layout fill-height>
                 <v-flex align-end flexbox>
