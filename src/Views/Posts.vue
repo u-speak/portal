@@ -45,7 +45,11 @@
         this.$http.get('https://uspeak.io/api/v1/chains/post').then((res) => {
           this.posts = res.body.results
         }, (err) => {
-          this.notify({ msg: err.body.message, show: true })
+          if (err.body.message === 'Chain Validation Failed') {
+            this.$bus.$emit('error', 'CVF')
+          } else {
+            this.notify({ msg: err.body.message, show: true })
+          }
         })
       },
       readPost (post) {

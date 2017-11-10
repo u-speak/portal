@@ -4,6 +4,15 @@
     <page-header></page-header>
     <main>
         <v-container>
+          <v-dialog v-model="dialog" persistent>
+            <v-card>
+              <v-card-title class="headline">{{ error.title }}</v-card-title>
+              <v-card-text>{{ error.text }}</v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <transition appear>
             <router-view></router-view>
           </transition>
@@ -43,8 +52,30 @@
 
   export default {
     name: 'page-uspeak',
+    data () {
+      return {
+        dialog: false,
+        error: {
+          title: '',
+          text: ''
+        }
+      }
+    },
     components: {
       PageHeader
+    },
+    created () {
+      this.$bus.$on('error', (error) => {
+        if (error === false) {
+          this.dialog = false
+        } else if (error === 'CVF') {
+          this.error = {
+            title: 'Chain validation failed',
+            text: 'Looks like the node you tried to connect to has been modified! You should switch node'
+          }
+          this.dialog = true
+        }
+      })
     },
     computed: {
       ...mapGetters(['x', 'y', 'show', 'msg', 'timeout'])
