@@ -3,7 +3,7 @@
 <template>
   <v-container grid-list-md>
     <v-layout row wrap align-center>
-      <v-flex xs4 v-for="post in posts" :key="post.hash">
+      <v-flex v-bind="{ [`xs${scaling}`]: true}" v-for="post in posts" :key="post.hash">
         <v-card class="my-3" hover>
           <v-card-media class="white--text" height="190px" :src="'https://picsum.photos/573/190/?random&hash='+post.hash">
             <v-container fill-height fluid>
@@ -39,6 +39,17 @@
       this.fetch()
       this.$bus.$on('search', (text) => { this.search(text) })
       this.$bus.$on('refresh', this.fetch)
+    },
+    computed: {
+      scaling () {
+        switch (this.$vuetify.breakpoint.name) {
+          case 'xs': return 12
+          case 'sm': return 6
+          case 'md': return 4
+          case 'lg': return 3
+          case 'xl': return 2
+        }
+      }
     },
     methods: {
       ...mapActions(['notify']),
