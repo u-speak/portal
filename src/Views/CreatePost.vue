@@ -39,6 +39,7 @@
 
 <script>
   import moment from 'moment'
+  import { mapActions } from 'vuex'
   import * as sha256 from 'crypto-js/sha256'
   import * as base64Enc from 'crypto-js/enc-base64'
   export default {
@@ -58,12 +59,19 @@
       }
     },
     methods: {
+      ...mapActions(['notify']),
       create () {
         this.$http.get('https://uspeak.io/api/v1/status').then((res) => {
           this.post.previous_hash = res.body.chains.post.last_hash
-          this.post.date = moment().valueOf()
+          this.post.date = moment().unix()
           this.post.hash = sha256('C' + this.post.content + 'T' + this.post.type + 'S' + this.post.signature + 'P' + this.post.public_key + 'D' + this.post.date + 'N' + this.post.nonce + 'PREV' + this.post.previous_hash.toString(base64Enc)).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_')
-          this.$http.post('https://uspeak.io/api/v1/chains/post', this.post)
+          this.$http.post('https://uspeak.io/api/v1/chains/post', this.post).then((res) => {
+            this.$router.push({path: '/'})
+          }, (err) => {
+            this.notify({ msg: err.body.message, show: true })
+          })
+        }, (err) => {
+          this.notify({ msg: err.body.message, show: true })
         })
       }
     }

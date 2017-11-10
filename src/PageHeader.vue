@@ -3,7 +3,7 @@
 <template>
   <v-toolbar fixed>
     <v-toolbar-title>
-      <v-btn flat icon to='/'>
+      <v-btn flat icon v-on:click="goHome">
         <v-icon>home</v-icon>
       </v-btn>
       uspeak
@@ -25,6 +25,13 @@
     methods: {
       search (text) {
         this.$bus.$emit('search', text)
+      },
+      goHome () {
+        if (this.$route.path === '/') {
+          this.$bus.$emit('refresh')
+        } else {
+          this.$router.push({path: '/'})
+        }
       }
     }
   }

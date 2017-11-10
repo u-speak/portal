@@ -4,7 +4,7 @@
   <v-layout row wrap>
     <v-flex xs12 v-if="post">
       <h3>{{ post.public_key }}</h3>
-      <h6>Created: {{ post.date }}</h6>
+      <h6>Created: {{ niceDate }}</h6>
       <v-card>
         <v-card-row class="blue darken-1">
           <v-card-title>
@@ -18,6 +18,9 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex'
+  import moment from 'moment'
+
   export default {
     name: 'post',
     data () {
@@ -28,10 +31,18 @@
     created () {
       this.fetch()
     },
+    computed: {
+      niceDate () {
+        return moment.unix(this.post.date).format('YYYY-MM-DD HH:mm')
+      }
+    },
     methods: {
+      ...mapActions(['notify']),
       fetch () {
         this.$http.get('https://uspeak.io/api/v1/chains/post/' + this.$route.params.hash).then((res) => {
           this.post = res.body
+        }, (err) => {
+          this.notify({ msg: err.body.message, show: true })
         })
       }
     }

@@ -19,17 +19,45 @@
     >
       <v-icon>add</v-icon>
     </v-btn>
+    <v-snackbar
+      :timeout="timeout"
+      :top="y === 'top'"
+      :bottom="y === 'bottomm'"
+      :right="x === 'right'"
+      :left="x === 'left'"
+      v-model="show"
+      v-on:input="snakerChange"
+    >
+      {{ msg }}
+      <v-btn icon="icon" flat class="pink--text" @click.native="setShow(false)">
+        <v-icon>close</v-icon>
+      </v-btn>
+    </v-snackbar>
   </div>
   </v-app>
 </template>
 
 <script>
   import PageHeader from './PageHeader.vue'
+  import { mapGetters, mapMutations } from 'vuex'
 
   export default {
     name: 'page-uspeak',
     components: {
       PageHeader
+    },
+    computed: {
+      ...mapGetters(['x', 'y', 'show', 'msg', 'timeout'])
+    },
+    methods: {
+      ...mapMutations(['setShow']),
+      snakerChange (val) {
+        // due to value doesn't when timeout
+        // so we listen input event and change value
+        if (val !== this.show) {
+          this.setShow(val)
+        }
+      }
     }
   }
 </script>
