@@ -13,7 +13,7 @@
               </v-layout>
             </v-container>
           </v-card-media>
-          <v-card-text>{{ post.content.substr(0, 80) }}</v-card-text>
+          <v-card-text>{{ summarize(post) }}</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn flat class="blue--text" v-on:click.native="readPost(post)">Read More</v-btn>
@@ -26,6 +26,7 @@
 
 <script>
   import { mapActions } from 'vuex'
+  import * as removeMd from 'remove-markdown'
 
   export default {
     name: 'posts',
@@ -51,6 +52,9 @@
             this.notify({ msg: err.body.message, show: true })
           }
         })
+      },
+      summarize (post) {
+        return removeMd(post.content).substr(0, 80)
       },
       readPost (post) {
         if (!post.hash) {
