@@ -57,6 +57,7 @@ const router = new VueRouter({
 const store = new Vuex.Store({
   state: {
     node: 'uspeak.io',
+    message: 'a nice person',
     snaker: {
       x: 'left',
       y: 'top',

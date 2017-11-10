@@ -35,6 +35,14 @@
       },
       changeNode (node) {
         this.$store.commit('setNode', node)
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
+          let msg = res.headers.map['x-server-message']
+          if (msg !== undefined) {
+            this.$store.state.message = msg[0]
+          } else {
+            this.$store.state.message = 'a nice person'
+          }
+        })
         this.$bus.$emit('refresh')
       },
       goHome () {

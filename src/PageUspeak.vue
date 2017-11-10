@@ -1,3 +1,8 @@
+<style>
+  #btn-add {
+    margin-bottom: 3em;
+  }
+</style>
 <template>
   <v-app dark id="e3" toolbar>
   <div id="app">
@@ -19,11 +24,13 @@
         </v-container>
     </main>
     <v-btn
+      id="btn-add"
+      color="pink"
       fab
       bottom
       right
-      dark
       fixed
+      light
       to="/create"
     >
       <v-icon>add</v-icon>
@@ -31,7 +38,7 @@
     <v-snackbar
       :timeout="timeout"
       :top="y === 'top'"
-      :bottom="y === 'bottomm'"
+      :bottom="y === 'bottom'"
       :right="x === 'right'"
       :left="x === 'left'"
       v-model="show"
@@ -43,6 +50,11 @@
       </v-btn>
     </v-snackbar>
   </div>
+  <v-footer app fixed>
+    <div>Brought to you by: {{ $store.state.message }}</div>
+    <v-spacer></v-spacer>
+    <div>Connected to: {{ $store.getters.node }}</div>
+  </v-footer>
   </v-app>
 </template>
 
