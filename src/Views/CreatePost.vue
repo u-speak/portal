@@ -16,6 +16,22 @@
             dark
             prepend-icon="create"
           ></v-text-field>
+          <v-text-field
+            name="key"
+            label="(Optional) ASCII-armored Public Key"
+            v-model="post.public_key"
+            multi-line
+            dark
+            prepend-icon="vpn_key"
+          ></v-text-field>
+          <v-text-field
+            name="signature"
+            label="(Optional) ASCII-armored Signature"
+            v-model="post.signature"
+            multi-line
+            dark
+            prepend-icon="assignment"
+          ></v-text-field>
         </v-flex>
         <v-flex xs6>
           <div>

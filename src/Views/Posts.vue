@@ -71,7 +71,7 @@
         if (!post.hash) {
           return
         }
-        this.$router.push({ name: 'post', params: { hash: post.hash } })
+        this.$router.push({ name: 'post', params: { bubblebabble: post.bubblebabble } })
       },
       search (text) {
         this.$http.get(`https://${this.$store.getters.node}/api/v1/search?q=${text}`).then((res) => {
