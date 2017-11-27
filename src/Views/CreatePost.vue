@@ -11,23 +11,23 @@
           <v-text-field
             name="content"
             label="Content"
-            v-model="post.content"
+            v-model="nice_content"
             multi-line
             dark
             prepend-icon="create"
           ></v-text-field>
           <v-text-field
-            name="key"
-            label="(Optional) ASCII-armored Public Key"
-            v-model="post.public_key"
+            name="privatekey"
+            label="(Optional) ASCII-armored Private Key"
+            v-model="private_key"
             multi-line
             dark
-            prepend-icon="vpn_key"
+            prepend-icon="assignment"
           ></v-text-field>
           <v-text-field
-            name="signature"
-            label="(Optional) ASCII-armored Signature"
-            v-model="post.signature"
+            name="passphrase"
+            label="Passphrase"
+            v-model="passphrase"
             multi-line
             dark
             prepend-icon="assignment"
@@ -36,7 +36,7 @@
         <v-flex xs6>
           <div>
             <h6>Preview</h6>
-            <p v-markdown="post.content"></p>
+            <p v-markdown="nice_content"></p>
           </div>
         </v-flex>
       </v-layout>
@@ -48,6 +48,13 @@
         >
           Submit
         </v-btn>
+        <v-btn
+          info
+          v-on:click.native="sign"
+          small
+        >
+         Sign 
+        </v-btn>
       </div>
     </v-flex>
   </v-layout>
@@ -58,6 +65,7 @@
   import { mapActions } from 'vuex'
   import * as sha256 from 'crypto-js/sha256'
   import * as base64Enc from 'crypto-js/enc-base64'
+  import * as openpgp from 'openpgp'
   export default {
     name: 'createpost',
     data () {
@@ -71,22 +79,47 @@
           public_key: '',
           signature: '',
           nonce: 0
-        }
+        },
+        private_key: '',
+        passphrase: '',
+        nice_content: ''
       }
     },
     methods: {
       ...mapActions(['notify']),
+      sign () {
+        var that = this
+        return new Promise((resolve, reject) => {
+          var privKeyObj = openpgp.key.readArmored(that.private_key).keys[0]
+          privKeyObj.decrypt(that.passphrase)
+          that.post.public_key = privKeyObj.toPublic().armor()
+          var options = {
+            data: that.nice_content,
+            privateKeys: privKeyObj,
+            detached: true
+          }
+          openpgp.sign(options).then(function (signed) {
+            that.post.content = signed.data
+            that.post.signature = signed.signature
+            resolve()
+          })
+        })
+      },
       create () {
         this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
           this.post.previous_hash = res.body.chains.post.last_hash
           this.post.date = moment().unix()
+          return this.sign()
+        }).then(() => {
+          console.log(this.post.signature)
           this.post.hash = sha256('C' + this.post.content + 'T' + this.post.type + 'S' + this.post.signature + 'P' + this.post.public_key + 'D' + this.post.date + 'N' + this.post.nonce + 'PREV' + this.post.previous_hash.toString(base64Enc)).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_')
           this.$http.post(`https://${this.$store.getters.node}/api/v1/chains/post`, this.post).then((res) => {
             this.$router.push({path: '/'})
           }, (err) => {
             this.notify({ msg: err.body.message, show: true })
           })
-        }, (err) => {
+        }).catch((err) => {
+          console.log(err)
           this.notify({ msg: err.body.message, show: true })
         })
       }

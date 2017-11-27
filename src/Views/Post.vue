@@ -4,13 +4,11 @@
   <v-layout row wrap>
     <v-flex xs12 v-if="post">
       <h6>Created: {{ niceDate }}</h6>
+      <h6>Signed by: {{ keyid }}</h6>
       <v-card>
-        <v-card-row class="blue darken-1">
-          <v-card-title>
-            <span class="white--text" v-markdown:content="post.content"></span>
-            <v-spacer></v-spacer>
-          </v-card-title>
-        </v-card-row>
+        <v-card-title primary-title>
+          <div class="white--text" v-markdown:content="niceContent"></div>
+        </v-card-title>
       </v-card>
     </v-flex>
   </v-layout>
@@ -25,7 +23,8 @@
     name: 'post',
     data () {
       return {
-        post: null
+        post: null,
+        keyid: ''
       }
     },
     created () {
@@ -34,6 +33,13 @@
     computed: {
       niceDate () {
         return moment.unix(this.post.date).format('YYYY-MM-DD HH:mm')
+      },
+      niceContent () {
+        try {
+          return openpgp.cleartext.readArmored(this.post.content).text
+        } catch (e) {
+          return this.post.content
+        }
       }
     },
     methods: {
@@ -47,10 +53,11 @@
               signature: openpgp.signature.readArmored(this.post.signature),
               publicKeys: openpgp.key.readArmored(this.post.public_key).keys
             }
+            var that = this
             openpgp.verify(this.options).then(function (verified) {
-              this.validity = verified.signatures[0].valid
-              if (this.validity) {
-                console.log('signed by key id ' + verified.signatures[0].keyid.toHex())
+              that.validity = verified.signatures[0].valid
+              if (that.validity) {
+                that.keyid = verified.signatures[0].keyid.toHex()
               }
             })
           }
