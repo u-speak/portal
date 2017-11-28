@@ -27,6 +27,7 @@
 <script>
   import { mapActions } from 'vuex'
   import * as removeMd from 'remove-markdown'
+  import * as openpgp from 'openpgp'
 
   export default {
     name: 'posts',
@@ -65,7 +66,11 @@
         })
       },
       summarize (post) {
-        return removeMd(post.content).substr(0, 80)
+        try {
+          return removeMd(openpgp.cleartext.readArmored(post.content).text).substr(0, 80)
+        } catch (e) {
+          return removeMd(post.content).substr(0, 80)
+        }
       },
       readPost (post) {
         if (!post.hash) {
