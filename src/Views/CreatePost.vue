@@ -48,13 +48,6 @@
         >
           Submit
         </v-btn>
-        <v-btn
-          info
-          v-on:click.native="sign"
-          small
-        >
-         Sign 
-        </v-btn>
       </div>
     </v-flex>
   </v-layout>
@@ -109,7 +102,10 @@
         this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
           this.post.previous_hash = res.body.chains.post.last_hash
           this.post.date = moment().unix()
-          return this.sign()
+          if (this.private_key !== '') {
+            return this.sign()
+          }
+          this.post.content = this.nice_content
         }).then(() => {
           console.log(this.post.signature)
           this.post.hash = sha256('C' + this.post.content + 'T' + this.post.type + 'S' + this.post.signature + 'P' + this.post.public_key + 'D' + this.post.date + 'N' + this.post.nonce + 'PREV' + this.post.previous_hash.toString(base64Enc)).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_')
