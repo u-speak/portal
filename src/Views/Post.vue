@@ -40,7 +40,7 @@
     },
     computed: {
       niceDate () {
-        return moment.unix(this.post.date).format('YYYY-MM-DD HH:mm')
+        return moment.unix(this.post.date).format('LLLL')
       },
       niceContent () {
         try {
@@ -65,7 +65,13 @@
             openpgp.verify(this.options).then(function (verified) {
               that.validity = verified.signatures[0].valid
               if (that.validity) {
-                that.keyid = verified.signatures[0].keyid.toHex()
+                that.$http.get(`https://keybase.io/_/api/1.0/user/lookup.json?key_suffix=${verified.signatures[0].keyid.toHex()}&fields=basics`).then((res) => {
+                  if (res.body.them[0]) {
+                    that.keyid = res.body.them[0].basics.username
+                  } else {
+                    that.keyid = verified.signatures[0].keyid.toHex()
+                  }
+                })
               }
             })
           }
