@@ -4,11 +4,14 @@
   <v-layout row wrap>
     <v-flex xs12 v-if="post">
       <h6>Created: {{ niceDate }}</h6>
-      <h6>Signed by: {{ keyid }}</h6>
-      <v-card>
-        <v-card-title primary-title>
-          <vue-markdown :source="niceContent" :anchor-attributes="anchorAttrs"></vue-markdown>
-        </v-card-title>
+      <vue-markdown :source="niceContent" :anchor-attributes="anchorAttrs"></vue-markdown>
+      <v-card v-if="keyid">
+        <v-card-row class="blue darken-1">
+          <v-card-title>
+            <span class="white--text">Signed by: {{ keyid }}</span>
+            <v-spacer></v-spacer>
+          </v-card-title>
+        </v-card-row>
       </v-card>
     </v-flex>
   </v-layout>

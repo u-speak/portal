@@ -36,7 +36,7 @@
         <v-flex xs6>
           <div>
             <h6>Preview</h6>
-            <vue-markdown :content="nice_content" :anchor-attributes="anchorAttrs"></vue-markdown>
+            <vue-markdown :source="nice_content" :anchor-attributes="anchorAttrs"></vue-markdown>
           </div>
         </v-flex>
       </v-layout>
