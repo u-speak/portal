@@ -36,7 +36,7 @@
         <v-flex xs6>
           <div>
             <h6>Preview</h6>
-            <p v-markdown="nice_content"></p>
+            <vue-markdown :content="nice_content" :anchor-attributes="anchorAttrs"></vue-markdown>
           </div>
         </v-flex>
       </v-layout>
@@ -59,6 +59,8 @@
   import * as sha256 from 'crypto-js/sha256'
   import * as base64Enc from 'crypto-js/enc-base64'
   import * as openpgp from 'openpgp'
+  import VueMarkdown from 'vue-markdown'
+
   export default {
     name: 'createpost',
     data () {
@@ -75,8 +77,15 @@
         },
         private_key: '',
         passphrase: '',
-        nice_content: ''
+        nice_content: '',
+        anchorAttrs: {
+          target: '_blank',
+          rel: 'noopener noreferrer nofollow'
+        }
       }
+    },
+    components: {
+      VueMarkdown
     },
     methods: {
       ...mapActions(['notify']),

@@ -7,7 +7,7 @@
       <h6>Signed by: {{ keyid }}</h6>
       <v-card>
         <v-card-title primary-title>
-          <div class="white--text" v-markdown:content="niceContent"></div>
+          <vue-markdown :source="niceContent" :anchor-attributes="anchorAttrs"></vue-markdown>
         </v-card-title>
       </v-card>
     </v-flex>
@@ -18,14 +18,22 @@
   import { mapActions } from 'vuex'
   import moment from 'moment'
   import * as openpgp from 'openpgp'
+  import VueMarkdown from 'vue-markdown'
 
   export default {
     name: 'post',
     data () {
       return {
         post: null,
-        keyid: ''
+        keyid: '',
+        anchorAttrs: {
+          target: '_blank',
+          rel: 'noopener noreferrer nofollow'
+        }
       }
+    },
+    components: {
+      VueMarkdown
     },
     created () {
       this.fetch()

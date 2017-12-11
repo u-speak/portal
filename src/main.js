@@ -3,7 +3,6 @@ import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import Vuex from 'vuex'
-import Marked from 'marked'
 import PageUspeak from './PageUspeak.vue'
 import openpgp from 'openpgp'
 const Home = resolve => require(['./Views/Home.vue'], resolve)
@@ -16,25 +15,6 @@ Vue.use(VueResource)
 Vue.use(Vuex)
 Vue.config.productionTip = false
 openpgp.initWorker({ path: '/static/openpgp.worker.js' })
-
-Marked.setOptions({
-  gfm: true,
-  tables: true,
-  breaks: false,
-  pedantic: false,
-  sanitize: true,
-  smartLists: true,
-  smartypants: false
-})
-
-Vue.directive('markdown', {
-  bind (el, binding, vnode) {
-    el.innerHTML = Marked(binding.value)
-  },
-  update (el, binding, vnode) {
-    el.innerHTML = Marked(binding.value)
-  }
-})
 
 const router = new VueRouter({
   routes: [
