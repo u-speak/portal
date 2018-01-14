@@ -10,7 +10,6 @@
         <v-flex>
           <mavon-editor
             v-model="nice_content"
-            prepend-icon="create"
             language="en"
           ></mavon-editor>
           <v-text-field

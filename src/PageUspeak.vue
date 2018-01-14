@@ -50,7 +50,7 @@
         onclick="document.getElementById('fileInput').click()"
       >
         <v-icon>add</v-icon>
-        <input ref="fileInput" id="fileInput" style="display:none" type="file" v-on:change="test()"/>
+        <input ref="fileInput" id="fileInput" style="display:none" type="file" v-on:change="imageUpload()"/>
       </v-btn>
       <v-btn
         fab
@@ -144,7 +144,7 @@
           reader.readAsDataURL(file)
         })
       },
-      test () {
+      imageUpload () {
         let ts = moment().unix()
         this.data = new FormData()
         this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
@@ -158,7 +158,7 @@
           this.data.set('image', this.$refs.fileInput.files[0])
         }).then(() => {
           this.$http.post(`https://${this.$store.getters.node}/api/v1/images`, this.data).then((res) => {
-            this.$router.push({path: '/'})
+            window.open(`https://${this.$store.getters.node}/api/v1/images/` + this.data.get('hash') + '.jpg')
           }, (err) => {
             this.notify({ msg: err.body.message, show: true })
           })

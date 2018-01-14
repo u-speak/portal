@@ -49,7 +49,8 @@ const store = new Vuex.Store({
       timeout: 3000,
       show: false,
       msg: ''
-    }
+    },
+    bSwitch: false
   },
   getters: {
     x ({ snaker }) {
@@ -69,6 +70,9 @@ const store = new Vuex.Store({
     },
     node ({ node }) {
       return node
+    },
+    bSwitch ({ bSwitch }) {
+      return bSwitch
     }
   },
   mutations: {
@@ -90,6 +94,9 @@ const store = new Vuex.Store({
     },
     setNode (state, n) {
       state.node = n
+    },
+    setBswitch (state, b) {
+      state.bSwitch = b
     }
   },
   actions: {

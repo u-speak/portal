@@ -9,7 +9,7 @@
       uspeak
     </v-toolbar-title>
     <v-spacer></v-spacer>
-    <v-switch v-bind:label="`${bSwitch ? 'Images' : 'Posts'}`" v-model="bSwitch"></v-switch>
+    <v-switch v-bind:label="`${$store.state.bSwitch ? 'Images' : 'Posts'}`" v-model="bSwitch"></v-switch>
     <v-spacer></v-spacer>
     <v-text-field
       label="Node"
@@ -31,11 +31,6 @@
 <script>
   export default {
     name: 'page-header',
-    data () {
-      return {
-        bSwitch: false
-      }
-    },
     methods: {
       search (text) {
         this.$bus.$emit('search', text)
@@ -57,6 +52,16 @@
           this.$bus.$emit('refresh')
         } else {
           this.$router.push({path: '/'})
+        }
+      }
+    },
+    computed: {
+      bSwitch: {
+        get () {
+          return this.$store.state.bSwitch
+        },
+        set (value) {
+          this.$store.commit('setBswitch', value)
         }
       }
     }
