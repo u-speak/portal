@@ -7,15 +7,12 @@
         <h5>Create Post</h5>
       </div>
       <v-layout row wrap>
-        <v-flex xs6>
-          <v-text-field
-            name="content"
-            label="Content"
+        <v-flex>
+          <mavon-editor
             v-model="nice_content"
-            multi-line
-            dark
             prepend-icon="create"
-          ></v-text-field>
+            language="en"
+          ></mavon-editor>
           <v-text-field
             name="privatekey"
             label="(Optional) ASCII-armored Private Key"
@@ -32,12 +29,6 @@
             dark
             prepend-icon="assignment"
           ></v-text-field>
-        </v-flex>
-        <v-flex xs6>
-          <div>
-            <h6>Preview</h6>
-            <vue-markdown :source="nice_content" :anchor-attributes="anchorAttrs"></vue-markdown>
-          </div>
         </v-flex>
       </v-layout>
       <div>

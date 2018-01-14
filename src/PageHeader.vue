@@ -9,6 +9,8 @@
       uspeak
     </v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-switch v-bind:label="`${bSwitch ? 'Images' : 'Posts'}`" v-model="bSwitch"></v-switch>
+    <v-spacer></v-spacer>
     <v-text-field
       label="Node"
       single-line
@@ -29,6 +31,11 @@
 <script>
   export default {
     name: 'page-header',
+    data () {
+      return {
+        bSwitch: false
+      }
+    },
     methods: {
       search (text) {
         this.$bus.$emit('search', text)
