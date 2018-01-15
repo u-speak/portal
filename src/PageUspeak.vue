@@ -39,7 +39,7 @@
         hover
         v-model="fab"
       >
-        <v-icon>account_circle</v-icon>
+        <v-icon>add</v-icon>
         <v-icon>close</v-icon>
       </v-btn>
       <v-btn
@@ -49,7 +49,7 @@
         color="green"
         onclick="document.getElementById('fileInput').click()"
       >
-        <v-icon>add</v-icon>
+        <v-icon>photo</v-icon>
         <input ref="fileInput" id="fileInput" style="display:none" type="file" v-on:change="imageUpload()"/>
       </v-btn>
       <v-btn
