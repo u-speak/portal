@@ -5,6 +5,8 @@ import VueResource from 'vue-resource'
 import Vuex from 'vuex'
 import PageUspeak from './PageUspeak.vue'
 import openpgp from 'openpgp'
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 const Home = resolve => require(['./Views/Home.vue'], resolve)
 const Post = resolve => require(['./Views/Post.vue'], resolve)
 const CreatePost = resolve => require(['./Views/CreatePost.vue'], resolve)
@@ -13,6 +15,7 @@ Vue.use(Vuetify)
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(Vuex)
+Vue.use(mavonEditor)
 Vue.config.productionTip = false
 openpgp.initWorker({ path: '/static/openpgp.worker.js' })
 
@@ -46,7 +49,8 @@ const store = new Vuex.Store({
       timeout: 3000,
       show: false,
       msg: ''
-    }
+    },
+    bSwitch: false
   },
   getters: {
     x ({ snaker }) {
@@ -66,6 +70,9 @@ const store = new Vuex.Store({
     },
     node ({ node }) {
       return node
+    },
+    bSwitch ({ bSwitch }) {
+      return bSwitch
     }
   },
   mutations: {
@@ -87,6 +94,9 @@ const store = new Vuex.Store({
     },
     setNode (state, n) {
       state.node = n
+    },
+    setBswitch (state, b) {
+      state.bSwitch = b
     }
   },
   actions: {

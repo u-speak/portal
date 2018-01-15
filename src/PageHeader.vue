@@ -9,6 +9,8 @@
       uspeak
     </v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-switch v-bind:label="`${$store.state.bSwitch ? 'Images' : 'Posts'}`" v-model="bSwitch"></v-switch>
+    <v-spacer></v-spacer>
     <v-text-field
       label="Node"
       single-line
@@ -50,6 +52,16 @@
           this.$bus.$emit('refresh')
         } else {
           this.$router.push({path: '/'})
+        }
+      }
+    },
+    computed: {
+      bSwitch: {
+        get () {
+          return this.$store.state.bSwitch
+        },
+        set (value) {
+          this.$store.commit('setBswitch', value)
         }
       }
     }

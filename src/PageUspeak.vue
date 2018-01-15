@@ -1,5 +1,5 @@
 <style>
-  #btn-add {
+  #btn-dial {
     margin-bottom: 3em;
   }
 </style>
@@ -23,18 +23,45 @@
           </transition>
         </v-container>
     </main>
-    <v-btn
-      id="btn-add"
-      color="pink"
-      fab
+    <v-speed-dial
+      v-model="fab"
       bottom
       right
       fixed
       light
-      to="/create"
+      id="btn-dial"
     >
-      <v-icon>add</v-icon>
-    </v-btn>
+      <v-btn
+        slot="activator"
+        color="blue darken-2"
+        dark
+        fab
+        hover
+        v-model="fab"
+      >
+        <v-icon>add</v-icon>
+        <v-icon>close</v-icon>
+      </v-btn>
+      <v-btn
+        fab
+        dark
+        small
+        color="green"
+        onclick="document.getElementById('fileInput').click()"
+      >
+        <v-icon>photo</v-icon>
+        <input ref="fileInput" id="fileInput" style="display:none" type="file" v-on:change="imageUpload()"/>
+      </v-btn>
+      <v-btn
+        fab
+        dark
+        small
+        color="indigo"
+        to="/create"
+      >
+        <v-icon>edit</v-icon>
+      </v-btn>
+    </v-speed-dial>
     <v-snackbar
       :timeout="timeout"
       :top="y === 'top'"
@@ -61,12 +88,18 @@
 <script>
   import PageHeader from './PageHeader.vue'
   import { mapGetters, mapMutations } from 'vuex'
+  import * as sha256 from 'crypto-js/sha256'
+  import * as base64Enc from 'crypto-js/enc-base64'
+  import moment from 'moment'
 
   export default {
     name: 'page-uspeak',
     data () {
       return {
         dialog: false,
+        formData: null,
+        data: null,
+        fab: null,
         error: {
           title: '',
           text: ''
@@ -100,6 +133,38 @@
         if (val !== this.show) {
           this.setShow(val)
         }
+      },
+      createImage (file) {
+        return new Promise((resolve) => {
+          let reader = new FileReader()
+
+          reader.onload = (e) => {
+            resolve(e.target.result.substr(e.target.result.indexOf('base64,') + 'base64,'.length).replace(/\+/g, '-').replace(/\//g, '_'))
+          }
+          reader.readAsDataURL(file)
+        })
+      },
+      imageUpload () {
+        let ts = moment().unix()
+        this.data = new FormData()
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
+          this.data.set('prevHash', res.body.chains.image.last_hash)
+          this.data.set('nonce', 0)
+          this.data.set('timestamp', ts)
+          return this.createImage(this.$refs.fileInput.files[0])
+        }).then((imb64) => {
+          let hd = 'C' + imb64 + 'TimageSPD' + ts + 'N' + 0 + 'PREV' + this.data.get('prevHash')
+          this.data.set('hash', sha256(hd).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_'))
+          this.data.set('image', this.$refs.fileInput.files[0])
+        }).then(() => {
+          this.$http.post(`https://${this.$store.getters.node}/api/v1/images`, this.data).then((res) => {
+            window.open(`https://${this.$store.getters.node}/api/v1/images/` + this.data.get('hash') + '.jpg')
+          }, (err) => {
+            this.notify({ msg: err.body.message, show: true })
+          })
+        }).catch((err) => {
+          this.notify({ msg: err.body.message, show: true })
+        })
       }
     }
   }
