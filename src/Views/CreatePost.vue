@@ -11,13 +11,14 @@
           <mavon-editor
             v-model="nice_content"
             language="en"
+            ref="md"
+            @imgAdd="$imgAdd"
           ></mavon-editor>
           <v-text-field
             name="privatekey"
             label="(Optional) ASCII-armored Private Key"
             v-model="private_key"
             multi-line
-            dark
             prepend-icon="assignment"
           ></v-text-field>
           <v-text-field
@@ -25,7 +26,6 @@
             label="Passphrase"
             v-model="passphrase"
             multi-line
-            dark
             prepend-icon="assignment"
           ></v-text-field>
         </v-flex>
@@ -106,7 +106,6 @@
           }
           this.post.content = this.nice_content
         }).then(() => {
-          console.log(this.post.signature)
           this.post.hash = sha256('C' + this.post.content + 'T' + this.post.type + 'S' + this.post.signature + 'P' + this.post.public_key + 'D' + this.post.date + 'N' + this.post.nonce + 'PREV' + this.post.previous_hash.toString(base64Enc)).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_')
           this.$http.post(`https://${this.$store.getters.node}/api/v1/chains/post`, this.post).then((res) => {
             this.$router.push({path: '/'})
@@ -114,7 +113,38 @@
             this.notify({ msg: err.body.message, show: true })
           })
         }).catch((err) => {
-          console.log(err)
+          this.notify({ msg: err.body.message, show: true })
+        })
+      },
+      createImage (file) {
+        return new Promise((resolve) => {
+          let reader = new FileReader()
+
+          reader.onload = (e) => {
+            resolve(e.target.result.substr(e.target.result.indexOf('base64,') + 'base64,'.length).replace(/\+/g, '-').replace(/\//g, '_'))
+          }
+          reader.readAsDataURL(file)
+        })
+      },
+      $imgAdd (pos, $file) {
+        let ts = moment().unix()
+        let data = new FormData()
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
+          data.set('prevHash', res.body.chains.image.last_hash)
+          data.set('nonce', 0)
+          data.set('timestamp', ts)
+          return this.createImage($file)
+        }).then((imb64) => {
+          let hd = 'C' + imb64 + 'TimageSPD' + ts + 'N' + 0 + 'PREV' + data.get('prevHash')
+          data.set('hash', sha256(hd).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_'))
+          data.set('image', $file)
+        }).then(() => {
+          this.$http.post(`https://${this.$store.getters.node}/api/v1/images`, data).then((res) => {
+            this.$refs.md.$img2Url(pos, `https://${this.$store.getters.node}/api/v1/images/` + data.get('hash') + '.jpg')
+          }, (err) => {
+            this.notify({ msg: err.body.message, show: true })
+          })
+        }).catch((err) => {
           this.notify({ msg: err.body.message, show: true })
         })
       }

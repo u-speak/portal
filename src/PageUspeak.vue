@@ -4,7 +4,7 @@
   }
 </style>
 <template>
-  <v-app dark id="e3" toolbar>
+  <v-app id="e3" toolbar>
   <div id="app">
     <page-header></page-header>
     <main>
@@ -116,7 +116,7 @@
         } else if (error === 'CVF') {
           this.error = {
             title: 'Chain validation failed',
-            text: 'Looks like the node you tried to connect to has been modified! You should switch node'
+            text: 'Looks like the node you tried to connect to has been modified! You should switch the node.'
           }
           this.dialog = true
         }
