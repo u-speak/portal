@@ -1,39 +1,36 @@
 <style>
   #btn-dial {
-    margin-bottom: 3em;
   }
 </style>
 <template>
   <v-app id="e3" toolbar>
   <div id="app">
-    <page-header></page-header>
-    <main>
-        <v-container>
-          <v-dialog v-model="dialog" persistent>
-            <v-card>
-              <v-card-title class="headline">{{ error.title }}</v-card-title>
-              <v-card-text>{{ error.text }}</v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <transition appear>
-            <router-view></router-view>
-          </transition>
-        </v-container>
-    </main>
+    <page-header :extended="extendheader"></page-header>
+    <v-container>
+      <v-dialog v-model="dialog" persistent>
+        <v-card>
+          <v-card-title class="headline">{{ error.title }}</v-card-title>
+          <v-card-text>{{ error.text }}</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-container>
+    <transition appear>
+      <router-view></router-view>
+    </transition>
     <v-speed-dial
+      color="accent"
       v-model="fab"
       bottom
       right
       fixed
-      light
       id="btn-dial"
     >
       <v-btn
         slot="activator"
-        color="blue darken-2"
+        color="accent"
         dark
         fab
         hover
@@ -46,7 +43,7 @@
         fab
         dark
         small
-        color="green"
+        color="red darken-4"
         onclick="document.getElementById('fileInput').click()"
       >
         <v-icon>photo</v-icon>
@@ -56,7 +53,7 @@
         fab
         dark
         small
-        color="indigo"
+        color="red darken-4"
         to="/create"
       >
         <v-icon>edit</v-icon>
@@ -77,11 +74,6 @@
       </v-btn>
     </v-snackbar>
   </div>
-  <v-footer app fixed>
-    <div>Brought to you by: {{ $store.state.message }}</div>
-    <v-spacer></v-spacer>
-    <div>Connected to: {{ $store.getters.node }}</div>
-  </v-footer>
   </v-app>
 </template>
 
@@ -123,7 +115,10 @@
       })
     },
     computed: {
-      ...mapGetters(['x', 'y', 'show', 'msg', 'timeout'])
+      ...mapGetters(['x', 'y', 'show', 'msg', 'timeout']),
+      extendheader () {
+        return this.$route.name === 'post' || this.$route.name === 'create'
+      }
     },
     methods: {
       ...mapMutations(['setShow']),

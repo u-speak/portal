@@ -11,11 +11,18 @@ const Home = resolve => require(['./Views/Home.vue'], resolve)
 const Post = resolve => require(['./Views/Post.vue'], resolve)
 const CreatePost = resolve => require(['./Views/CreatePost.vue'], resolve)
 
-Vue.use(Vuetify)
+Vue.use(Vuetify, {
+  theme: {
+    primary: '#00BCD4',
+    secondary: '#0097A7',
+    accent: '#FF5252',
+    error: '#b71c1c'
+  }})
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(Vuex)
 Vue.use(mavonEditor)
+
 Vue.config.productionTip = false
 openpgp.initWorker({ path: '/static/openpgp.worker.js' })
 

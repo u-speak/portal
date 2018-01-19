@@ -1,13 +1,17 @@
-<style></style>
+<style>
+  .card--flex-toolbar {
+    margin-top: -64px;
+  }
+</style>
 
 <template>
-  <v-layout row wrap>
-    <v-flex xs12>
-      <div>
-        <h5>Create Post</h5>
-      </div>
-      <v-layout row wrap>
-        <v-flex>
+  <v-layout row>
+    <v-flex md8 offset-md2 xs12>
+      <v-card class="card--flex-toolbar">
+        <v-toolbar card color="white" prominent>
+          <v-toolbar-title>Create a post</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
           <mavon-editor
             v-model="nice_content"
             language="en"
@@ -19,26 +23,22 @@
             label="(Optional) ASCII-armored Private Key"
             v-model="private_key"
             multi-line
-            prepend-icon="assignment"
+            prepend-icon="fingerprint"
           ></v-text-field>
           <v-text-field
             name="passphrase"
             label="Passphrase"
             v-model="passphrase"
-            multi-line
-            prepend-icon="assignment"
+            :append-icon="password_visible ? 'visibility_off' : 'visibility'"
+            :append-icon-cb="() => (password_visible = !password_visible)"
+            :type="password_visible ? 'text' : 'password'"
+            prepend-icon="vpn_key"
           ></v-text-field>
-        </v-flex>
-      </v-layout>
-      <div>
-        <v-btn
-          info
-          v-on:click.native="create"
-          small
-        >
-          Submit
-        </v-btn>
-      </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn flat color="accent" v-on:click.native="create">Submit</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-flex>
   </v-layout>
 </template>
@@ -55,6 +55,7 @@
     name: 'createpost',
     data () {
       return {
+        password_visible: true,
         post: {
           hash: '',
           previous_hash: '',

@@ -1,10 +1,15 @@
-<style></style>
+<style>
+  .my-3 {
+    min-height: 23em;
+    max-height: 23em;
+  }
+</style>
 
 <template>
   <v-container grid-list-md>
     <v-layout row wrap align-center>
       <v-flex v-bind="{ [`xs${scaling}`]: true}" v-for="post in posts" :key="post.hash">
-        <v-card class="my-3" hover>
+        <v-card class="my-3" hover v-on:click.native="readPost(post)">
           <v-card-media class="white--text" height="190px" :src="'https://picsum.photos/573/190/?random&hash='+post.hash">
             <v-container fill-height fluid>
               <v-layout fill-height>
@@ -16,7 +21,7 @@
           <v-card-text>{{ summarize(post) }}</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn flat class="blue--text" v-on:click.native="readPost(post)">Read More</v-btn>
+            <v-btn flat color="accent" v-on:click.native="readPost(post)">Read More</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -66,10 +71,16 @@
         })
       },
       summarize (post) {
+        let t = ''
         try {
-          return removeMd(openpgp.cleartext.readArmored(post.content).text).substr(0, 80)
+          t = removeMd(openpgp.cleartext.readArmored(post.content).text)
         } catch (e) {
-          return removeMd(post.content).substr(0, 80)
+          t = removeMd(post.content)
+        }
+        if (t.length > 77) {
+          return t.substr(0, 77) + '...'
+        } else {
+          return t
         }
       },
       readPost (post) {

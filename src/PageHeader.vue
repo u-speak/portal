@@ -1,7 +1,7 @@
 <style></style>
 
 <template>
-  <v-toolbar fixed>
+  <v-toolbar color="primary" dark :extended="extended">
     <v-toolbar-title>
       <v-btn flat icon v-on:click="goHome">
         <v-icon>home</v-icon>
@@ -29,6 +29,7 @@
 <script>
   export default {
     name: 'page-header',
+    props: ['extended'],
     methods: {
       search (text) {
         this.$bus.$emit('search', text)

@@ -1,17 +1,26 @@
-<style></style>
+<style>
+  .card--flex-toolbar {
+    margin-top: -64px;
+  }
+</style>
 
 <template>
-  <v-layout row wrap>
-    <v-flex xs12 v-if="post">
-      <h6>Created: {{ niceDate }}</h6>
-      <vue-markdown :source="niceContent" :anchor-attributes="anchorAttrs"></vue-markdown>
-      <v-card v-if="keyid">
-        <v-card-row class="blue darken-1">
-          <v-card-title>
+  <v-layout row>
+    <v-flex md8 offset-md2 xs12>
+      <v-card class="card--flex-toolbar">
+        <v-toolbar card color="white" prominent>
+          <v-toolbar-title>Title</v-toolbar-title>
+        </v-toolbar>
+
+        <v-card-text>
+          <vue-markdown :source="niceContent" :anchor-attributes="anchorAttrs"></vue-markdown>
+        </v-card-text>
+        <v-card-text class="blue">
+          Created: {{ niceDate }}
+        </v-card-text>
+        <v-card-text class="green darken-1" v-if="keyid">
             <span class="white--text">Signed by: {{ keyid }}</span>
-            <v-spacer></v-spacer>
-          </v-card-title>
-        </v-card-row>
+        </v-card-text>
       </v-card>
     </v-flex>
   </v-layout>
@@ -43,13 +52,21 @@
     },
     computed: {
       niceDate () {
-        return moment.unix(this.post.date).format('LLLL')
+        if (this.post) {
+          return moment.unix(this.post.date).format('LLLL')
+        } else {
+          return ''
+        }
       },
       niceContent () {
-        try {
-          return openpgp.cleartext.readArmored(this.post.content).text
-        } catch (e) {
-          return this.post.content
+        if (this.post) {
+          try {
+            return openpgp.cleartext.readArmored(this.post.content).text
+          } catch (e) {
+            return this.post.content
+          }
+        } else {
+          return ''
         }
       }
     },
