@@ -20,6 +20,45 @@
     <transition appear>
       <router-view></router-view>
     </transition>
+    <v-navigation-drawer
+      temporary
+      v-model="drawer"
+      right
+      light
+      absolute
+    >
+      <v-list class="pa-1">
+        <v-list-tile avatar>
+          <v-list-tile-avatar>
+            <img src="/static/img/v.png" />
+          </v-list-tile-avatar>
+          <v-list-tile-content>
+            <v-list-tile-title>uspeak.io</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+      <v-list class="pt-0" dense>
+        <v-divider></v-divider>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>settings_ethernet</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Connected to</v-list-tile-title>
+            <v-list-tile-sub-title>{{ $store.getters.node }}</v-list-tile-sub-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>message</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Brought to you by</v-list-tile-title>
+            <v-list-tile-sub-title>{{ $store.state.message }}</v-list-tile-sub-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
     <v-speed-dial
       color="accent"
       v-model="fab"
@@ -58,6 +97,15 @@
       >
         <v-icon>edit</v-icon>
       </v-btn>
+      <v-btn
+        fab
+        dark
+        small
+        v-on:click="drawer = !drawer"
+        color="red darken-4"
+      >
+        <v-icon>live_help</v-icon>
+      </v-btn>
     </v-speed-dial>
     <v-snackbar
       :timeout="timeout"
@@ -88,6 +136,7 @@
     name: 'page-uspeak',
     data () {
       return {
+        drawer: true,
         dialog: false,
         formData: null,
         data: null,

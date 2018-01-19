@@ -9,17 +9,17 @@
     <v-flex md8 offset-md2 xs12>
       <v-card class="card--flex-toolbar">
         <v-toolbar card color="white" prominent>
-          <v-toolbar-title>Title</v-toolbar-title>
+          <v-toolbar-title>{{ title }}</v-toolbar-title>
         </v-toolbar>
 
         <v-card-text>
           <vue-markdown :source="niceContent" :anchor-attributes="anchorAttrs"></vue-markdown>
         </v-card-text>
-        <v-card-text class="blue">
-          Created: {{ niceDate }}
+        <v-card-text class="info">
+          <span class="white--text">Created: {{ niceDate }}</span>
         </v-card-text>
-        <v-card-text class="green darken-1" v-if="keyid">
-            <span class="white--text">Signed by: {{ keyid }}</span>
+        <v-card-text class="success" v-if="keyid">
+          <span>Signed by: {{ keyid }}</span>
         </v-card-text>
       </v-card>
     </v-flex>
@@ -31,6 +31,7 @@
   import moment from 'moment'
   import * as openpgp from 'openpgp'
   import VueMarkdown from 'vue-markdown'
+  import * as matter from 'gray-matter'
 
   export default {
     name: 'post',
@@ -58,15 +59,27 @@
           return ''
         }
       },
-      niceContent () {
+      mdContent () {
+        let md = ''
         if (this.post) {
           try {
-            return openpgp.cleartext.readArmored(this.post.content).text
+            md = openpgp.cleartext.readArmored(this.post.content).text
           } catch (e) {
-            return this.post.content
+            md = this.post.content
           }
+        }
+        return md
+      },
+      niceContent () {
+        let m = matter(this.mdContent)
+        return m.content
+      },
+      title () {
+        let m = matter(this.mdContent)
+        if (m.data.title) {
+          return m.data.title
         } else {
-          return ''
+          return 'Untitled Post'
         }
       }
     },

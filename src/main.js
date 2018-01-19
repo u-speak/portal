@@ -16,7 +16,9 @@ Vue.use(Vuetify, {
     primary: '#00BCD4',
     secondary: '#0097A7',
     accent: '#FF5252',
-    error: '#b71c1c'
+    error: '#b71c1c',
+    info: '#3F51B5',
+    success: '#8BC34A'
   }})
 Vue.use(VueRouter)
 Vue.use(VueResource)

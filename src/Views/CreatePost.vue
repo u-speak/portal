@@ -12,8 +12,15 @@
           <v-toolbar-title>Create a post</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
+          <v-text-field
+            name="post_title"
+            v-model="postTitle"
+            label="Post Title"
+            :rules="[(v) => v.length <= 100 || 'Max 100 characters']"
+            :counter="100"
+          ></v-text-field>
           <mavon-editor
-            v-model="nice_content"
+            v-model="mdContent"
             language="en"
             ref="md"
             @imgAdd="$imgAdd"
@@ -49,6 +56,7 @@
   import * as sha256 from 'crypto-js/sha256'
   import * as base64Enc from 'crypto-js/enc-base64'
   import * as openpgp from 'openpgp'
+  import * as matter from 'gray-matter'
   import VueMarkdown from 'vue-markdown'
 
   export default {
@@ -68,7 +76,8 @@
         },
         private_key: '',
         passphrase: '',
-        nice_content: '',
+        mdContent: '',
+        postTitle: '',
         anchorAttrs: {
           target: '_blank',
           rel: 'noopener noreferrer nofollow'
@@ -77,6 +86,11 @@
     },
     components: {
       VueMarkdown
+    },
+    computed: {
+      nice_content () {
+        return matter.stringify(this.mdContent, {title: this.postTitle})
+      }
     },
     methods: {
       ...mapActions(['notify']),

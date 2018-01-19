@@ -1,15 +1,15 @@
 <style>
-  .my-3 {
-    min-height: 23em;
-    max-height: 23em;
-  }
+.my-3 {
+  min-height: 31em;
+  max-height: 31em;
+}
 </style>
 
 <template>
   <v-container grid-list-md>
     <v-layout row wrap align-center>
       <v-flex v-bind="{ [`xs${scaling}`]: true}" v-for="post in posts" :key="post.hash">
-        <v-card class="my-3" hover v-on:click.native="readPost(post)">
+        <v-card title class="my-3" hover v-on:click.native="readPost(post)">
           <v-card-media class="white--text" height="190px" :src="'https://picsum.photos/573/190/?random&hash='+post.hash">
             <v-container fill-height fluid>
               <v-layout fill-height>
@@ -18,7 +18,9 @@
               </v-layout>
             </v-container>
           </v-card-media>
-          <v-card-text>{{ summarize(post) }}</v-card-text>
+          <v-card-title>
+            <h3 class="headline mb-0">{{ title(post) }}</h3>
+          </v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn flat color="accent" v-on:click.native="readPost(post)">Read More</v-btn>
@@ -31,8 +33,8 @@
 
 <script>
   import { mapActions } from 'vuex'
-  import * as removeMd from 'remove-markdown'
   import * as openpgp from 'openpgp'
+  import * as matter from 'gray-matter'
 
   export default {
     name: 'posts',
@@ -70,18 +72,21 @@
           }
         })
       },
-      summarize (post) {
+      title (post) {
+        let m = matter(this.content(post))
+        if (m.data.title) {
+          return m.data.title
+        }
+        return 'Untitled Post'
+      },
+      content (post) {
         let t = ''
         try {
-          t = removeMd(openpgp.cleartext.readArmored(post.content).text)
+          t = openpgp.cleartext.readArmored(post.content).text
         } catch (e) {
-          t = removeMd(post.content)
+          t = post.content
         }
-        if (t.length > 77) {
-          return t.substr(0, 77) + '...'
-        } else {
-          return t
-        }
+        return t
       },
       readPost (post) {
         if (!post.hash) {
