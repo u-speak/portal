@@ -2,8 +2,7 @@
 
 <template>
   <div>
-    <posts v-if="!$store.state.bSwitch"></posts>
-    <h1 v-else>TODO IMAGE CHAIN</h1>
+    <posts></posts>
   </div>
 </template>
 

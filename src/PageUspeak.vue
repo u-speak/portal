@@ -83,16 +83,6 @@
         dark
         small
         color="red darken-4"
-        onclick="document.getElementById('fileInput').click()"
-      >
-        <v-icon>photo</v-icon>
-        <input ref="fileInput" id="fileInput" style="display:none" type="file" v-on:change="imageUpload()"/>
-      </v-btn>
-      <v-btn
-        fab
-        dark
-        small
-        color="red darken-4"
         to="/create"
       >
         <v-icon>edit</v-icon>
@@ -128,9 +118,6 @@
 <script>
   import PageHeader from './PageHeader.vue'
   import { mapGetters, mapMutations } from 'vuex'
-  import * as sha256 from 'crypto-js/sha256'
-  import * as base64Enc from 'crypto-js/enc-base64'
-  import moment from 'moment'
 
   export default {
     name: 'page-uspeak',
@@ -186,28 +173,6 @@
             resolve(e.target.result.substr(e.target.result.indexOf('base64,') + 'base64,'.length).replace(/\+/g, '-').replace(/\//g, '_'))
           }
           reader.readAsDataURL(file)
-        })
-      },
-      imageUpload () {
-        let ts = moment().unix()
-        this.data = new FormData()
-        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
-          this.data.set('prevHash', res.body.chains.image.last_hash)
-          this.data.set('nonce', 0)
-          this.data.set('timestamp', ts)
-          return this.createImage(this.$refs.fileInput.files[0])
-        }).then((imb64) => {
-          let hd = 'C' + imb64 + 'TimageSPD' + ts + 'N' + 0 + 'PREV' + this.data.get('prevHash')
-          this.data.set('hash', sha256(hd).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_'))
-          this.data.set('image', this.$refs.fileInput.files[0])
-        }).then(() => {
-          this.$http.post(`https://${this.$store.getters.node}/api/v1/images`, this.data).then((res) => {
-            window.open(`https://${this.$store.getters.node}/api/v1/images/` + this.data.get('hash') + '.jpg')
-          }, (err) => {
-            this.notify({ msg: err.body.message, show: true })
-          })
-        }).catch((err) => {
-          this.notify({ msg: err.body.message, show: true })
         })
       }
     }

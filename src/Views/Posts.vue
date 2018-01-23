@@ -10,7 +10,7 @@
     <v-layout row wrap align-center>
       <v-flex v-bind="{ [`xs${scaling}`]: true}" v-for="post in posts" :key="post.hash">
         <v-card title class="my-3" hover v-on:click.native="readPost(post)">
-          <v-card-media class="white--text" height="190px" :src="'https://picsum.photos/573/190/?random&hash='+post.hash">
+          <v-card-media class="white--text" height="190px" :src="postImage(post)">
             <v-container fill-height fluid>
               <v-layout fill-height>
                 <v-flex align-end flexbox>
@@ -78,6 +78,13 @@
           return m.data.title
         }
         return 'Untitled Post'
+      },
+      postImage (post) {
+        let m = matter(this.content(post))
+        if (m.data.image) {
+          return m.data.image
+        }
+        return 'https://picsum.photos/573/190/?random&hash=' + post.hash
       },
       content (post) {
         let t = ''

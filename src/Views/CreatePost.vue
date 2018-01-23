@@ -19,6 +19,11 @@
             :rules="[(v) => v.length <= 100 || 'Max 100 characters']"
             :counter="100"
           ></v-text-field>
+          <v-text-field
+            name="post_image"
+            v-model="postImage"
+            label="Post Image Link"
+          ></v-text-field>
           <mavon-editor
             v-model="mdContent"
             language="en"
@@ -78,6 +83,7 @@
         passphrase: '',
         mdContent: '',
         postTitle: '',
+        postImage: '',
         anchorAttrs: {
           target: '_blank',
           rel: 'noopener noreferrer nofollow'
@@ -89,7 +95,7 @@
     },
     computed: {
       nice_content () {
-        return matter.stringify(this.mdContent, {title: this.postTitle})
+        return matter.stringify(this.mdContent, {title: this.postTitle, image: this.postImage})
       }
     },
     methods: {
