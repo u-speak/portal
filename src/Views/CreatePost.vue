@@ -58,8 +58,8 @@
 <script>
   import moment from 'moment'
   import { mapActions } from 'vuex'
-  import * as sha256 from 'crypto-js/sha256'
-  import * as base64Enc from 'crypto-js/enc-base64'
+  import base64js from 'base64-js'
+  import blake from 'blakejs'
   import * as openpgp from 'openpgp'
   import * as matter from 'gray-matter'
   import VueMarkdown from 'vue-markdown'
@@ -70,14 +70,17 @@
       return {
         password_visible: true,
         post: {
+          nonce: 0,
+          validates: [],
           hash: '',
-          previous_hash: '',
-          date: 0,
-          type: 'post',
           content: '',
-          public_key: '',
-          signature: '',
-          nonce: 0
+          type: 'post',
+          data: {
+            content: '',
+            pubkey: '',
+            signature: '',
+            date: 0
+          }
         },
         private_key: '',
         passphrase: '',
@@ -101,34 +104,54 @@
     methods: {
       ...mapActions(['notify']),
       sign () {
-        var that = this
+        let that = this
         return new Promise((resolve, reject) => {
           var privKeyObj = openpgp.key.readArmored(that.private_key).keys[0]
           privKeyObj.decrypt(that.passphrase)
-          that.post.public_key = privKeyObj.toPublic().armor()
-          var options = {
+          that.post.data.pubkey = privKeyObj.toPublic().armor().replace(/\r/g, '')
+          var publicKey = openpgp.key.readArmored(that.post.data.pubkey).keys[0]
+          var signOpt = {
             data: that.nice_content,
             privateKeys: privKeyObj,
             detached: true
           }
-          openpgp.sign(options).then(function (signed) {
-            that.post.content = signed.data
-            that.post.signature = signed.signature
-            resolve()
+          var verifyOpt = {
+            publicKeys: publicKey
+          }
+          openpgp.sign(signOpt).then(function (signed) {
+            verifyOpt.message = new openpgp.cleartext.CleartextMessage(that.nice_content)
+            verifyOpt.signature = openpgp.signature.readArmored(signed.signature)
+            that.post.data.signature = signed.signature.replace(/\r/g, '')
+            openpgp.verify(verifyOpt).then(function (verified) {
+              that.post.data.content = verified.data
+              resolve()
+            })
           })
         })
       },
       create () {
         this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
-          this.post.previous_hash = res.body.chains.post.last_hash
-          this.post.date = moment().unix()
+          this.post.validates = res.body.recomendations
+          this.post.data.date = moment().unix()
           if (this.private_key !== '') {
             return this.sign()
           }
-          this.post.content = this.nice_content
         }).then(() => {
-          this.post.hash = sha256('C' + this.post.content + 'T' + this.post.type + 'S' + this.post.signature + 'P' + this.post.public_key + 'D' + this.post.date + 'N' + this.post.nonce + 'PREV' + this.post.previous_hash.toString(base64Enc)).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_')
-          this.$http.post(`https://${this.$store.getters.node}/api/v1/chains/post`, this.post).then((res) => {
+          this.post.content = base64js.fromByteArray(blake.blake2b(`C${this.post.data.content}D${this.post.data.date}P${this.post.data.pubkey}S${this.post.data.signature}`, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
+          let h
+          while (true) {
+            let hstr = `C${this.post.content}N${this.post.nonce}T${this.post.type}`
+            this.post.validates.forEach(function (v) { hstr += `V${v}` })
+            h = blake.blake2b(hstr, null, 32)
+            console.log(h)
+            if (h[0] === 0) {
+              break
+            }
+            this.post.nonce++
+          }
+          this.post.hash = base64js.fromByteArray(h).replace(/\+/g, '-').replace(/\//g, '_')
+
+          this.$http.post(`https://${this.$store.getters.node}/api/v1/tangle/${this.post.type}`, this.post).then((res) => {
             this.$router.push({path: '/'})
           }, (err) => {
             this.notify({ msg: err.body.message, show: true })
@@ -148,26 +171,7 @@
         })
       },
       $imgAdd (pos, $file) {
-        let ts = moment().unix()
-        let data = new FormData()
-        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
-          data.set('prevHash', res.body.chains.image.last_hash)
-          data.set('nonce', 0)
-          data.set('timestamp', ts)
-          return this.createImage($file)
-        }).then((imb64) => {
-          let hd = 'C' + imb64 + 'TimageSPD' + ts + 'N' + 0 + 'PREV' + data.get('prevHash')
-          data.set('hash', sha256(hd).toString(base64Enc).replace(/\+/g, '-').replace(/\//g, '_'))
-          data.set('image', $file)
-        }).then(() => {
-          this.$http.post(`https://${this.$store.getters.node}/api/v1/images`, data).then((res) => {
-            this.$refs.md.$img2Url(pos, `https://${this.$store.getters.node}/api/v1/images/` + data.get('hash') + '.jpg')
-          }, (err) => {
-            this.notify({ msg: err.body.message, show: true })
-          })
-        }).catch((err) => {
-          this.notify({ msg: err.body.message, show: true })
-        })
+        // TODO Tangle
       }
     }
   }
