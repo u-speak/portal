@@ -104,12 +104,14 @@
     methods: {
       ...mapActions(['notify']),
       sign () {
+        openpgp.config.show_version = false
         let that = this
         return new Promise((resolve, reject) => {
           var privKeyObj = openpgp.key.readArmored(that.private_key).keys[0]
           privKeyObj.decrypt(that.passphrase)
           that.post.data.pubkey = privKeyObj.toPublic().armor().replace(/\r/g, '')
           var publicKey = openpgp.key.readArmored(that.post.data.pubkey).keys[0]
+          publicKey.getKeyIds().forEach((k) => { console.log(k.toHex()) })
           var signOpt = {
             data: that.nice_content,
             privateKeys: privKeyObj,
@@ -124,7 +126,11 @@
             that.post.data.signature = signed.signature.replace(/\r/g, '')
             openpgp.verify(verifyOpt).then(function (verified) {
               that.post.data.content = verified.data
-              resolve()
+              let sig = verified.signatures[0].signature.packets[0]
+              let sigdata = openpgp.util.concatUint8Array([sig.signatureData, sig.unhashedSubpackets, sig.signedHashValue, sig.signature])
+              console.log(sigdata)
+              let sighash = base64js.fromByteArray(blake.blake2b(sigdata, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
+              resolve({keyid: publicKey.getKeyIds()[0], sighash: sighash})
             })
           })
         })
@@ -136,8 +142,10 @@
           if (this.private_key !== '') {
             return this.sign()
           }
-        }).then(() => {
-          this.post.content = base64js.fromByteArray(blake.blake2b(`C${this.post.data.content}D${this.post.data.date}P${this.post.data.pubkey}S${this.post.data.signature}`, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
+        }).then((ret) => {
+          let cstr = `C${this.post.data.content}D${this.post.data.date}P${ret.keyid.toHex().toUpperCase()}S${ret.sighash}`
+          console.log(cstr)
+          this.post.content = base64js.fromByteArray(blake.blake2b(cstr, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
           let h
           while (true) {
             let hstr = `C${this.post.content}N${this.post.nonce}T${this.post.type}`
