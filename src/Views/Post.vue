@@ -90,12 +90,14 @@
         this.$http.get(`https://${this.$store.getters.node}/api/v1/tangle/${this.$route.params.bubblebabble}`).then((res) => {
           if (res.body.type === 'post') {
             this.post = res.body.data
-            if (this.post.signature !== '' && this.post.public_key !== '') {
+            if (this.post.signature !== '' && this.post.pubkey !== '') {
               this.options = {
-                message: openpgp.cleartext.readArmored(this.post.content),
+                message: openpgp.message.fromText(this.post.content),
                 signature: openpgp.signature.readArmored(this.post.signature),
-                publicKeys: openpgp.key.readArmored(this.post.public_key).keys
+                publicKeys: openpgp.key.readArmored(this.post.pubkey).keys
               }
+              console.log(this.post.pubkey)
+              console.log(openpgp.key.readArmored(this.post.pubkey))
               var that = this
               openpgp.verify(this.options).then(function (verified) {
                 that.validity = verified.signatures[0].valid
