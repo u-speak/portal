@@ -97,9 +97,9 @@
       content (post) {
         let t = ''
         try {
-          t = openpgp.cleartext.readArmored(post.content).text
+          t = openpgp.cleartext.readArmored(post.data.content).text
         } catch (e) {
-          t = post.content
+          t = post.data.content
         }
         return t
       },

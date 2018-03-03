@@ -26,7 +26,7 @@ Vue.use(Vuex)
 Vue.use(mavonEditor)
 
 Vue.config.productionTip = false
-openpgp.initWorker({ path: '/static/openpgp.worker.js' })
+openpgp.initWorker({ path: '/static/openpgp.worker.min.js' })
 
 const router = new VueRouter({
   routes: [
