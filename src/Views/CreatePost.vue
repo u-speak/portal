@@ -112,7 +112,6 @@
           privKeyObj.decrypt(that.passphrase)
           that.post.data.pubkey = privKeyObj.toPublic().armor()
           var publicKey = openpgp.key.readArmored(privKeyObj.toPublic().armor()).keys[0]
-          publicKey.getKeyIds().forEach((k) => { console.log(k.toHex()) })
           const signOpt = {
             data: that.nice_content,
             privateKeys: privKeyObj,
@@ -142,14 +141,12 @@
           }
         }).then((ret) => {
           let cstr = `C${this.post.data.content}D${this.post.data.date}P${ret.toHex().toUpperCase()}S${this.post.data.signature}`
-          console.log(cstr)
           this.post.content = base64js.fromByteArray(blake.blake2b(cstr, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
           let h
           while (true) {
             let hstr = `C${this.post.content}N${this.post.nonce}T${this.post.type}`
             this.post.validates.forEach(function (v) { hstr += `V${v}` })
             h = blake.blake2b(hstr, null, 32)
-            console.log(h)
             if (h[0] === 0) {
               break
             }
@@ -199,7 +196,8 @@
             }
             nonce++
           }
-          data.set('hash', h)
+          let hash = base64js.fromByteArray(h).replace(/\+/g, '-').replace(/\//g, '_')
+          data.set('hash', hash)
           data.set('image', $file)
           data.set('nonce', nonce)
         }).then(() => {
