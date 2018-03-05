@@ -105,32 +105,30 @@
       ...mapActions(['notify']),
       sign () {
         openpgp.config.show_version = false
+        openpgp.config.show_comment = false
         let that = this
         return new Promise((resolve, reject) => {
           var privKeyObj = openpgp.key.readArmored(that.private_key).keys[0]
           privKeyObj.decrypt(that.passphrase)
-          that.post.data.pubkey = privKeyObj.toPublic().armor().replace(/\r/g, '')
-          var publicKey = openpgp.key.readArmored(that.post.data.pubkey).keys[0]
+          that.post.data.pubkey = privKeyObj.toPublic().armor()
+          var publicKey = openpgp.key.readArmored(privKeyObj.toPublic().armor()).keys[0]
           publicKey.getKeyIds().forEach((k) => { console.log(k.toHex()) })
-          var signOpt = {
+          const signOpt = {
             data: that.nice_content,
             privateKeys: privKeyObj,
-            detached: true
+            detached: true,
+            armor: false
           }
           var verifyOpt = {
             publicKeys: publicKey
           }
           openpgp.sign(signOpt).then(function (signed) {
             verifyOpt.message = new openpgp.cleartext.CleartextMessage(that.nice_content)
-            verifyOpt.signature = openpgp.signature.readArmored(signed.signature)
-            that.post.data.signature = signed.signature.replace(/\r/g, '')
+            verifyOpt.signature = signed.signature
+            that.post.data.signature = signed.signature.armor()
             openpgp.verify(verifyOpt).then(function (verified) {
               that.post.data.content = verified.data
-              let sig = verified.signatures[0].signature.packets[0]
-              let sigdata = openpgp.util.concatUint8Array([sig.signatureData, sig.unhashedSubpackets, sig.signedHashValue, sig.signature])
-              console.log(sigdata)
-              let sighash = base64js.fromByteArray(blake.blake2b(sigdata, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
-              resolve({keyid: publicKey.getKeyIds()[0], sighash: sighash})
+              resolve(publicKey.getKeyIds()[0])
             })
           })
         })
@@ -143,7 +141,7 @@
             return this.sign()
           }
         }).then((ret) => {
-          let cstr = `C${this.post.data.content}D${this.post.data.date}P${ret.keyid.toHex().toUpperCase()}S${ret.sighash}`
+          let cstr = `C${this.post.data.content}D${this.post.data.date}P${ret.toHex().toUpperCase()}S${this.post.data.signature}`
           console.log(cstr)
           this.post.content = base64js.fromByteArray(blake.blake2b(cstr, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')
           let h

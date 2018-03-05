@@ -18,8 +18,10 @@
         <v-card-text class="info">
           <span class="white--text">Created: {{ niceDate }}</span>
         </v-card-text>
-        <v-card-text class="success" v-if="keyid">
-            <span>Signed by: <v-avatar v-if="picture"><img :src="picture"></v-avatar> <a :href="`https://keybase.io/${this.keyid}`" target="_blank" style="color:white">{{ keyid }}</a></span>
+        <v-card-text class="success" v-if="url">
+            <span>Signed by: <v-avatar v-if="picture">
+              <img :src="picture"></v-avatar> <a :href="`${this.url}`" target="_blank" style="color:white">0x{{ keyid }}</a>
+            </span>
         </v-card-text>
       </v-card>
     </v-flex>
@@ -40,6 +42,7 @@
         post: null,
         keyid: '',
         picture: '',
+        url: '',
         anchorAttrs: {
           target: '_blank',
           rel: 'noopener noreferrer nofollow'
@@ -104,12 +107,13 @@
                 if (that.validity) {
                   that.$http.get(`https://keybase.io/_/api/1.0/user/lookup.json?key_suffix=${verified.signatures[0].keyid.toHex()}&fields=basics,pictures`).then((res) => {
                     if (res.body.them[0]) {
-                      that.keyid = res.body.them[0].basics.username_cased
+                      that.url = `https://keybase.io/${res.body.them[0].basics.username_cased}`
                       if (res.body.them[0].pictures.primary.url) {
                         that.picture = res.body.them[0].pictures.primary.url
                       }
                     } else {
                       that.keyid = verified.signatures[0].keyid.toHex()
+                      that.url = `https://pgp.mit.edu/pks/lookup?search=0x${verified.signatures[0].keyid.toHex()}`
                     }
                   })
                 }
