@@ -177,7 +177,40 @@
         })
       },
       $imgAdd (pos, $file) {
-        // TODO Tangle
+        let ts = moment().unix()
+        let data = new FormData()
+        let nonce = 0
+        let validates = ''
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
+          validates = res.body.recomendations
+          data.set('validates', validates)
+          data.set('timestamp', ts)
+          return this.createImage($file)
+        }).then((imb64) => {
+          let contenth = blake.blake2b(imb64, null, 32)
+          let content = base64js.fromByteArray(contenth).replace(/\+/g, '-').replace(/\//g, '_')
+          let h
+          while (true) {
+            let hstr = `C${content}N${nonce}Timage`
+            validates.forEach(function (v) { hstr += `V${v}` })
+            h = blake.blake2b(hstr, null, 32)
+            if (h[0] === 0) {
+              break
+            }
+            nonce++
+          }
+          data.set('hash', h)
+          data.set('image', $file)
+          data.set('nonce', nonce)
+        }).then(() => {
+          this.$http.post(`https://${this.$store.getters.node}/api/v1/image`, data).then((res) => {
+            this.$refs.md.$img2Url(pos, `https://${this.$store.getters.node}/api/v1/image/` + data.get('hash') + '.jpg')
+          }, (err) => {
+            this.notify({ msg: err.body.message, show: true })
+          })
+        }).catch((err) => {
+          this.notify({ msg: err.body.message, show: true })
+        })
       }
     }
   }
