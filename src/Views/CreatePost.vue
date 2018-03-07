@@ -48,7 +48,7 @@
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
-          <v-btn flat color="accent" v-on:click.native="create">Submit</v-btn>
+          <v-btn flat color="accent" v-on:click.native="check">Submit</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
@@ -132,13 +132,25 @@
           })
         })
       },
+      check () {
+        if (this.private_key === '') {
+          let that = this
+          const opt = {
+            userIds: { name: 'Anonymous uspeak user', email: 'anon@uspeak.io' }
+          }
+          openpgp.generateKey(opt).then(function (newKey) {
+            that.private_key = newKey.privateKeyArmored
+            that.create()
+          })
+        } else {
+          this.create()
+        }
+      },
       create () {
         this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
           this.post.validates = res.body.recomendations
           this.post.data.date = moment().unix()
-          if (this.private_key !== '') {
-            return this.sign()
-          }
+          return this.sign()
         }).then((ret) => {
           let cstr = `C${this.post.data.content}D${this.post.data.date}P${ret.toHex().toUpperCase()}S${this.post.data.signature}`
           this.post.content = base64js.fromByteArray(blake.blake2b(cstr, null, 32)).replace(/\+/g, '-').replace(/\//g, '_')

@@ -19,8 +19,13 @@
           <span class="white--text">Created: {{ niceDate }}</span>
         </v-card-text>
         <v-card-text class="success" v-if="url">
-            <span>Signed by: <v-avatar v-if="picture">
-              <img :src="picture"></v-avatar> <a :href="`${this.url}`" target="_blank" style="color:white">0x{{ keyid }}</a>
+            <span>Signed by:
+              <v-avatar v-if="picture">
+              <img :src="picture">
+              </v-avatar>
+              <a :href="`${this.url}`" target="_blank" style="color:white">{{ keyid }}</a>
+              <br>
+              Key Fingerprint: {{ fingerprint }}
             </span>
         </v-card-text>
       </v-card>
@@ -43,6 +48,7 @@
         keyid: '',
         picture: '',
         url: '',
+        fingerprint: '',
         anchorAttrs: {
           target: '_blank',
           rel: 'noopener noreferrer nofollow'
@@ -97,7 +103,7 @@
               this.options = {
                 message: openpgp.message.fromText(this.post.content),
                 signature: openpgp.signature.readArmored(this.post.signature),
-                publicKeys: openpgp.key.readArmored(this.post.pubkey).keys
+                publicKeys: openpgp.key.readArmored(this.post.pubkey).keys[0]
               }
               console.log(this.post.pubkey)
               console.log(openpgp.key.readArmored(this.post.pubkey))
@@ -108,11 +114,13 @@
                   that.$http.get(`https://keybase.io/_/api/1.0/user/lookup.json?key_suffix=${verified.signatures[0].keyid.toHex()}&fields=basics,pictures`).then((res) => {
                     if (res.body.them[0]) {
                       that.url = `https://keybase.io/${res.body.them[0].basics.username_cased}`
+                      that.keyid = res.body.them[0].basics.username_cased
                       if (res.body.them[0].pictures.primary.url) {
                         that.picture = res.body.them[0].pictures.primary.url
                       }
                     } else {
-                      that.keyid = verified.signatures[0].keyid.toHex()
+                      that.keyid = that.options.publicKeys.users[0].userId.userid
+                      that.fingerprint = that.options.publicKeys.primaryKey.fingerprint
                       that.url = `https://pgp.mit.edu/pks/lookup?search=0x${verified.signatures[0].keyid.toHex()}`
                     }
                   })
