@@ -19,7 +19,10 @@
           <span class="white--text">Created: {{ niceDate }}</span>
         </v-card-text>
         <v-card-text class="success" v-if="url">
-            <span>Signed by:
+            <span>
+              Site Weight: {{ weight }}
+              <br>
+              Signed by:
               <v-avatar v-if="picture">
               <img :src="picture">
               </v-avatar>
@@ -45,6 +48,7 @@
     data () {
       return {
         post: null,
+        weight: 0,
         keyid: '',
         picture: '',
         url: '',
@@ -99,6 +103,7 @@
         this.$http.get(`https://${this.$store.getters.node}/api/v1/tangle/${this.$route.params.bubblebabble}`).then((res) => {
           if (res.body.type === 'post') {
             this.post = res.body.data
+            this.weight = res.body.weight
             if (this.post.signature !== '' && this.post.pubkey !== '') {
               this.options = {
                 message: openpgp.message.fromText(this.post.content),
