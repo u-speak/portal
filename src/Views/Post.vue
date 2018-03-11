@@ -5,8 +5,8 @@
 </style>
 
 <template>
-  <v-layout row>
-    <v-flex md8 offset-md2 xs12>
+  <v-layout row justify-center>
+    <v-flex md8 xs12>
       <v-card class="card--flex-toolbar">
         <v-toolbar card color="white" prominent>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
@@ -18,10 +18,11 @@
         <v-card-text class="info">
           <span class="white--text">Created: {{ niceDate }}</span>
         </v-card-text>
+        <v-card-text class="warning">
+          <span class="white--text">Site Weight: {{ weight }}</span>
+        </v-card-text>
         <v-card-text class="success" v-if="url">
             <span>
-              Site Weight: {{ weight }}
-              <br>
               Signed by:
               <v-avatar v-if="picture">
               <img :src="picture">
@@ -33,6 +34,27 @@
         </v-card-text>
       </v-card>
     </v-flex>
+    <v-dialog v-model="dialog" persistent>
+      <v-card>
+        <v-card-title>
+          <span class="headline">Please enter the password for the decryption of the post:</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-text-field v-model="password" label="Password" type="password" required></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click.native="dialog = false">Close</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="dialog = false">Decrypt</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-layout>
 </template>
 
@@ -47,6 +69,9 @@
     name: 'post',
     data () {
       return {
+        dialog: false,
+        mdContent: '',
+        password: '',
         post: null,
         weight: 0,
         keyid: '',
@@ -65,6 +90,21 @@
     created () {
       this.fetch()
     },
+    watch: {
+      dialog: function (val) {
+        if (val === false) {
+          let armoredMessage = openpgp.message.readArmored(this.post.content)
+          var decOpt = {
+            password: this.password,
+            message: armoredMessage
+          }
+          let that = this
+          openpgp.decrypt(decOpt).then(function (decrypted) {
+            that.mdContent = decrypted.data
+          })
+        }
+      }
+    },
     computed: {
       niceDate () {
         if (this.post) {
@@ -72,17 +112,6 @@
         } else {
           return ''
         }
-      },
-      mdContent () {
-        let md = ''
-        if (this.post) {
-          try {
-            md = openpgp.cleartext.readArmored(this.post.content).text
-          } catch (e) {
-            md = this.post.content
-          }
-        }
-        return md
       },
       niceContent () {
         let m = matter(this.mdContent)
@@ -110,8 +139,6 @@
                 signature: openpgp.signature.readArmored(this.post.signature),
                 publicKeys: openpgp.key.readArmored(this.post.pubkey).keys[0]
               }
-              console.log(this.post.pubkey)
-              console.log(openpgp.key.readArmored(this.post.pubkey))
               var that = this
               openpgp.verify(this.options).then(function (verified) {
                 that.validity = verified.signatures[0].valid
@@ -132,6 +159,8 @@
                 }
               })
             }
+            this.mdContent = this.post.content
+            this.dialog = true
           }
         }, (err) => {
           this.notify({ msg: err.body.message, show: true })

@@ -31,6 +31,13 @@
             @imgAdd="$imgAdd"
           ></mavon-editor>
           <v-text-field
+            name="password"
+            label="(Optional) Password for encryption"
+            v-model="password"
+            prepend-icon="vpn_key"
+          >
+          </v-text-field>
+          <v-text-field
             name="privatekey"
             label="(Optional) ASCII-armored Private Key"
             v-model="private_key"
@@ -83,6 +90,7 @@
           }
         },
         private_key: '',
+        password: '',
         passphrase: '',
         mdContent: '',
         postTitle: '',
@@ -113,7 +121,7 @@
           that.post.data.pubkey = privKeyObj.toPublic().armor()
           var publicKey = openpgp.key.readArmored(privKeyObj.toPublic().armor()).keys[0]
           const signOpt = {
-            data: that.nice_content,
+            data: (that.password === '') ? that.nice_content : that.mdContent,
             privateKeys: privKeyObj,
             detached: true,
             armor: false
@@ -122,7 +130,7 @@
             publicKeys: publicKey
           }
           openpgp.sign(signOpt).then(function (signed) {
-            verifyOpt.message = new openpgp.cleartext.CleartextMessage(that.nice_content)
+            verifyOpt.message = new openpgp.cleartext.CleartextMessage((that.password === '') ? that.nice_content : that.mdContent)
             verifyOpt.signature = signed.signature
             that.post.data.signature = signed.signature.armor()
             openpgp.verify(verifyOpt).then(function (verified) {
@@ -133,6 +141,9 @@
         })
       },
       check () {
+        if (this.password !== '') {
+          this.encrypt()
+        }
         if (this.private_key === '') {
           let that = this
           const opt = {
@@ -145,6 +156,18 @@
         } else {
           this.create()
         }
+      },
+      encrypt () {
+        const encOpt = {
+          data: this.nice_content,
+          passwords: this.password
+        }
+        openpgp.config.show_version = false
+        openpgp.config.show_comment = false
+        let that = this
+        openpgp.encrypt(encOpt).then(function (encrypted) {
+          that.mdContent = encrypted.data
+        })
       },
       create () {
         this.$http.get(`https://${this.$store.getters.node}/api/v1/status`).then((res) => {
