@@ -160,6 +160,7 @@
               })
             }
             this.mdContent = this.post.content
+            console.log(openpgp.message.readArmored(this.post.content))
             this.dialog = true
           }
         }, (err) => {
