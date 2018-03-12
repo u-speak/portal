@@ -110,7 +110,7 @@
         this.$router.push({ name: 'post', params: { bubblebabble: post.bubblebabble } })
       },
       search (text) {
-        this.$http.get(`https://${this.$store.getters.node}/api/v1/search?q=${text}`).then((res) => {
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/tangle?q=${text}`).then((res) => {
           this.posts = res.body.results
         }, (err) => {
           this.notify({ msg: err.body.message, show: true })
