@@ -62,8 +62,16 @@
     methods: {
       ...mapActions(['notify']),
       fetch () {
-        this.$http.get(`https://${this.$store.getters.node}/api/v1/chains/post`).then((res) => {
-          this.posts = res.body.results
+        this.$http.get(`https://${this.$store.getters.node}/api/v1/tangle/random`).then((res) => {
+          this.posts = []
+          var that = this
+          res.body.forEach(function (item) {
+            that.$http.get(`https://${that.$store.getters.node}/api/v1/tangle/${item}`).then((res) => {
+              if (res.body.type === 'post') {
+                that.posts.push(res.body)
+              }
+            })
+          })
         }, (err) => {
           if (err.body.message === 'Chain Validation Failed') {
             this.$bus.$emit('error', 'CVF')
@@ -89,9 +97,9 @@
       content (post) {
         let t = ''
         try {
-          t = openpgp.cleartext.readArmored(post.content).text
+          t = openpgp.cleartext.readArmored(post.data.content).text
         } catch (e) {
-          t = post.content
+          t = post.data.content
         }
         return t
       },

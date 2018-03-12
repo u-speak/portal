@@ -1,7 +1,6 @@
 <style>
-  #btn-dial {
-  }
 </style>
+
 <template>
   <v-app id="e3" toolbar>
   <div id="app">
@@ -192,5 +191,9 @@
 
   #e3 .input-group--focused .input-group__append-icon {
     color: inherit !important;
+  }
+
+  img {
+  max-width: 100%;
   }
 </style>
