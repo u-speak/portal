@@ -1,4 +1,4 @@
-# portal
+# portal [ ![Codeship Status for u-speak/portal](https://app.codeship.com/projects/84b56150-724a-0136-a8a6-3675cf281030/status?branch=master)](https://app.codeship.com/projects/299393)
 
 > Web frontend for uspeak
 
